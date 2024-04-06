@@ -3,7 +3,7 @@
 	$servername="localhost";
 	$username="root";
 	$password="";
-	$dbname="docs";
+	$dbname="tutorial";
 	$link=mysqli_connect($servername,$username,$password,$dbname);
 
 	if($connect -> conncet_error){
