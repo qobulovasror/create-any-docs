@@ -37,8 +37,6 @@ if (!empty($_POST["email"]) and !empty($_POST['password'])) {
   }else{
     $error_message = "email yoki parol xato";
   }
-
-
 }
 ?>
 

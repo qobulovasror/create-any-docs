@@ -5,6 +5,8 @@ function redrect($url)
 }
 session_start();
 
+require ("../config/db.php");
+
 if (isset($_GET['logout'])) {
     $_SESSION = array();
     session_destroy();
@@ -14,9 +16,24 @@ if (isset($_GET['logout'])) {
     header("Location: index.php");
     exit();
 }
+
+$doc_id = "";
+$page = 1;
+$page_content = "";
+
+if (!empty($_GET['docId'])) {
+    $doc_id = $_GET['docId'];
+} else {
+    redrect('../index.php');
+}
+if (!empty($_GET['page'])) {
+    $page = $_GET['page'];
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -28,37 +45,60 @@ if (isset($_GET['logout'])) {
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../assets/css/read.css" />
+    <script src="../assets/js/showdown.js"></script>
 </head>
 
 <body>
     <?php include '../components/navbar.php'; ?>
+
+    <?php
+    $query = "SELECT * FROM `doc_pages` WHERE `doc_id`=" . $doc_id . " ORDER BY id;";
+    $result = mysqli_query($link, $query) or die(mysqli_error($link));
+    for ($data = []; $row = mysqli_fetch_assoc($result); $data[] = $row)
+        ;
+    ?>
     <div class="d-flex">
         <div class="left-nav pt-3">
             <h3 class="text-center">Python</h3>
             <div class="list-group  list-group-flush">
-                <a href="#" class="list-group-item list-group-item-action active" aria-current="true">
-                    The current link item
-                </a>
-                <a href="#" class="list-group-item list-group-item-action">A second link item</a>
-                <a href="#" class="list-group-item list-group-item-action">A third link item</a>
-                <a href="#" class="list-group-item list-group-item-action">A fourth link item</a>
+                <?php
+                $list = "";
+                foreach ($data as $value) {
+                    $list .= '<a href="/templates/read.php?docId='.$doc_id. '&page='. $value['id'] ;
+                    if($page== $value['id']) {
+                        $list .= '" class="list-group-item list-group-item-action active" aria-current="true">' ;
+                        $page_content =  $value['body'];
+                    }else{
+                        $list .= '" class="list-group-item list-group-item-action" aria-current="true">' ;
+                    }
+                    $list .= $value['title'];
+                    $list .= '</a>';
+                }
+                echo $list;
+                ?>
             </div>
         </div>
 
         <div class="right-side">
             <div class="container-2  py-3">
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Beatae rem optio inventore assumenda sint,
-                    dicta eum libero dolore neque earum. Optio quaerat molestias eum ipsum asperiores est libero, at
-                    adipisci ut minus iure facilis ratione soluta accusamus nulla laudantium esse possimus debitis dolor
-                    deserunt officiis veritatis sint fugiat saepe? Dolore, sequi repellendus! Numquam, dolorum aliquid
-                    cum ullam, quam itaque perspiciatis vitae alias veniam dicta tempore commodi. Harum voluptates,
-                    repellat rerum, assumenda minus maxime ea est animi magnam nesciunt optio aut saepe fugiat at
-                    pariatur asperiores! Exercitationem ullam velit vel quam expedita, nisi nobis dolores excepturi nam
-                    quasi asperiores sequi numquam.</p>
+                <?php
+                ?>
+                <p id="doc_body"></p>
             </div>
         </div>
     </div>
-    
+
+    <script>
+        const data = `<?php echo $page_content; ?>`
+        const converter = new showdown.Converter();
+        const doc_body = document.getElementById("doc_body");
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            let html = converter.makeHtml(data);
+            doc_body.innerHTML=html;
+        });
+    </script>
+
 </body>
 
 </html>
