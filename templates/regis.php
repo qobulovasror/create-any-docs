@@ -45,7 +45,8 @@ if (!empty($_POST)) {
       mysqli_query($link, $query) or die(mysqli_error($link));
       session_start();
       $_SESSION['auth'] = true;
-      $_SESSION['email']=$email['email'];
+      $_SESSION['id'] = mysqli_insert_id($link);
+      $_SESSION['email']=$email;
       redrect("../index.php");
     }
   } else {
