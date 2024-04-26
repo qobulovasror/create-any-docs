@@ -52,8 +52,8 @@ if (!empty($_POST["email"]) and !empty($_POST['password'])) {
 <body>
   <div class="container">
     <div class="row">
-      <div class="col-md-4"></div>
-      <div class="col-md-4 mt-5">
+      <div class="col-sm-2 col-md-4"></div>
+      <div class="col-sm-8 col-md-4 mt-5">
         <div class="card p-4 mt-5">
           <h2 class="text-center">Tizimga kirish</h2>
           <form action="/templates/login.php" method="POST">
@@ -81,7 +81,7 @@ if (!empty($_POST["email"]) and !empty($_POST['password'])) {
           </form>
         </div>
       </div>
-      <div class="col-md-4"></div>
+      <div class="col-sm-2 col-md-4"></div>
     </div>
   </div>
 </body>
