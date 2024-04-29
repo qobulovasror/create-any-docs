@@ -20,6 +20,14 @@ if (isset($_GET['logout'])) {
 
 require('../config/db.php');
 
+if(!empty($_POST["name"]) && !empty($_POST["type"])){
+    
+}else{
+
+
+}
+
+
 $title = "";
 $titleID = "";
 $setTitleErr = "";

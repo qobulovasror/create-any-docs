@@ -21,7 +21,7 @@
                 </a>
                 <?php } else{ ?>
                     <div class="d-flex">
-                        <a href="/templates/create.php" class="btn btn-primary me-2"  style="height: 40px">Yaratish</a>
+                        <a href="/templates/docList.php" class="btn btn-primary me-2"  style="height: 40px">Mening qo'llanmalarim</a>
                         <a href="/?logout=1" class="btn btn-danger"  style="height: 40px">Chiqish</a>
                     </div>
                 <?php } ?>
