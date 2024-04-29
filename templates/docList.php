@@ -51,7 +51,7 @@ if (!empty($_POST["title"]) && $_POST["formType"]=="add") {
         $query = "INSERT INTO docs SET author_id='$userID', name='$title'";
         if (mysqli_query($link, $query)) {
             $titleID = mysqli_insert_id($link);
-            redrect("/templates/create.php?editDocId=".$titleID);
+            redrect("/templates/create.php?docId=".$titleID);
         } else {
             echo "Error: " . $insertQuery . "<br>" . mysqli_error($conn);
         }
@@ -64,8 +64,7 @@ if (!empty($_POST["title"]) && $_POST["formType"]=="add") {
 if(!empty($_POST["name"]) && !empty($_POST["status"]) && $_POST["formType"]=="edit"){
     $title = $_POST["name"];
     $status = $_POST["status"];
-    $status = $_POST["editDocId"];
-    $id = $_POST['formType'];
+    $id = $_POST['editDocId'];
     str_replace("'", "\'", $title);
     $query = "UPDATE `docs` SET `name`='$title', `status`='$status' WHERE `id`='$id'";
     mysqli_query($link, $query) or die(mysqli_error($link));
@@ -185,7 +184,7 @@ $myDocs = getOwnDocs($link, $userID);
                                                 class="bi bi-eye" style="font-size: 15px"></i></a>
                                         <a type="button" href="/templates/docList.php?editDoc='.$value["id"].'" title="edit doc" class="btn btn-success btn-sm me-1"><i class="bi bi-pencil-square"
                                                 style="font-size: 15px"></i></a>
-                                        <a type="button" href="/templates/create.php?editDocId='.$value["id"].'" title="edit items" class="btn btn-info btn-sm me-1"><i class="bi bi-list-ul"
+                                        <a type="button" href="/templates/create.php?docId='.$value["id"].'" title="edit items" class="btn btn-info btn-sm me-1"><i class="bi bi-list-ul"
                                                 style="font-size: 15px"></i></a>
                                         <a type="button" href="/components/confirm.php?type=doc&owner='.$value["author_id"].'&delItemId='.$value["id"].'&message=Document o\'chirilsinmi" title="delete doc" class="btn btn-danger btn-sm"><i class="bi bi-trash3"
                                                 style="font-size: 15px"></i></a></td>' ; 
@@ -218,7 +217,7 @@ $myDocs = getOwnDocs($link, $userID);
                         <div class="mb-3">
                             <label for="tutorialStatus" class="form-label">Qo'llanma holati</label>
                             <select class="form-select" id="tutorialStatus" name="status">
-                                <option value="0" <?php if(!$editDoc["status"]) echo "selected";?> >Chop qilmaslik</option>
+                                <option value="NULL" <?php if(!$editDoc["status"]) echo "selected";?> >Chop qilmaslik</option>
                                 <option value="1" <?php if($editDoc["status"]) echo "selected";?>>Chop qilish</option>
                             </select>
                         </div>
@@ -246,86 +245,6 @@ $myDocs = getOwnDocs($link, $userID);
             </div>
         </div>
     </div>
-
-
-    <script>
-        const setTitle = document.getElementById('setTitle')
-        const setTitleBtn = document.getElementById('setTitleBtn')
-        const doc_title = document.getElementById('doc_title')
-        const setTitleInputID = document.getElementById('setTitleInputID')
-
-        const addThemeWindow = document.getElementById('addThemeWindow')
-        const addThemeBtn = document.getElementById('addThemeBtn')
-        const addThemeInputID = document.getElementById('addThemeInputID')
-        const closeAddThemeWinBtn = document.getElementById('closeAddThemeWinBtn')
-
-
-        // document.addEventListener("DOMContentLoaded", function() {
-        //     const oldCreatedTitle = <?php if ($title) {
-            echo ('"' . $title . '"');
-        } else {
-            echo 'false';
-        } ?>;
-        //     if(!oldCreatedTitle) {
-        //         setTitle.style.display = "block";
-        //     }else{
-        //         doc_title.innerHTML = oldCreatedTitle;
-        //     }
-        // })
-
-        // doc_title.addEventListener("click", function() {
-        //     setTitle.style.display = "block";
-        //     if(doc_title.innerHTML){
-        //         setTitleInputID.value = doc_title.innerText;
-        //     }
-        // })
-
-        setTitleBtn.addEventListener('click', () => {
-            if (setTitleInputID.value.length > 0) {
-                setTitle.style.display = "none";
-                doc_title.innerHTML = setTitleInputID.value;
-
-                // const dataToSend = {
-                //     key1: 'value1',
-                //     key2: 'value2'
-                // };
-
-                // // Make a POST request using fetch
-                // fetch('/templates/createBack.php', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json'
-                //     },
-                //     body: JSON.stringify(dataToSend)
-                // })
-                // .then(response => {
-                //     console.log(response);
-                //     if (!response.ok) {
-                //         throw new Error('Network response was not ok');
-                //     }
-                //     return response.json(); // Parse the JSON from the response
-                // })
-                // .then(data => {
-                //     console.log('Response from server:', data);
-                // })
-                // .catch(error => {
-                //     console.error('Error:', error);
-                // });
-
-            }
-        })
-
-        // addThemeBtn.addEventListener('click', function(){
-        //     addThemeWindow.style.display = 'block'
-        // })
-        // closeAddThemeWinBtn.addEventListener('click', function(){
-        //     addThemeWindow.style.display = 'none'
-        // })
-
-
-
-    </script>
-
 </body>
 
 </html>

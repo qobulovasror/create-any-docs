@@ -20,34 +20,67 @@ if (isset($_GET['logout'])) {
 
 require('../config/db.php');
 
-if(!empty($_POST["name"]) && !empty($_POST["type"])){
-    
-}else{
-
-
+function getDocItems($link, $id){
+    $query = "SELECT * FROM doc_pages WHERE doc_id=$id";
+    $result = mysqli_query($link, $query) or die(mysqli_error($link));
+    for ($data = []; $row = mysqli_fetch_assoc($result); $data[] = $row);
+    return $data;
+}
+function getDocTitle($link, $id){
+    $query = "SELECT name FROM docs WHERE id=$id";
+    $result = mysqli_query($link, $query) or die(mysqli_error($link));
+    for ($data = []; $row = mysqli_fetch_assoc($result); $data[] = $row);
+    return $data;
 }
 
 
-$title = "";
-$titleID = "";
-$setTitleErr = "";
-if(!empty($_POST["title"]) && !empty($_POST["formStatus"])){
-    $title = $_POST["title"];
-    str_replace("'", "\'", $title);
-    $formStatus = $_POST["formStatus"];
-    if($formStatus=="create"){
-        $userID = $_SESSION["id"];
-        $query = "INSERT INTO docs SET author_id='$userID', name='$title'";
-        if (mysqli_query($link, $query)) {
-            $titleID = mysqli_insert_id($link);
-        } else {
-            echo "Error: " . $insertQuery . "<br>" . mysqli_error($conn);
+$curDocID = "";
+if(empty($_GET["docId"])){
+    if(!empty($_POST["formType"]) && !empty($_POST["title"]) && !empty($_POST["body"]) ){
+        $title = $_POST['title'];
+        $body = $_POST['body'];
+        $doc_id = $_POST["docId"];
+        
+        // str_replace("'", "\'", $title);
+        // str_replace("'", "\'", $body);
+        if($_POST["formType"]=="addDocPart"){
+            $query = "INSERT INTO `doc_pages` (`doc_id`, `title`, `body`) VALUES ('$doc_id', '$title', '$body')";
+            mysqli_query($link, $query) or die(mysqli_error($link));
+        }else{
+            // $query = "UPDATE `doc_pages` SET `title`='$title',`body`='$body' WHERE id=docPartID";
+            // mysqli_query($link, $query) or die(mysqli_error($link));
         }
+        $curDocID = $_POST['docId'];
     }else{
-        $query = "UPDATE docs SET `name`='$title' WHERE id='$formStatus'";
-        mysqli_query($link, $query) or die(mysqli_error($link));
+        // redrect("../index.php");   
     }
+}else{
+    $curDocID = $_GET['docId'];
 }
+
+$docParts = getDocItems($link, $curDocID);
+$docTitle = getDocTitle($link, $curDocID);
+
+// $title = "";
+// $titleID = "";
+// $setTitleErr = "";
+// if(!empty($_POST["title"]) && !empty($_POST["formStatus"])){
+//     $title = $_POST["title"];
+//     str_replace("'", "\'", $title);
+//     $formStatus = $_POST["formStatus"];
+//     if($formStatus=="create"){
+//         $userID = $_SESSION["id"];
+//         $query = "INSERT INTO docs SET author_id='$userID', name='$title'";
+//         if (mysqli_query($link, $query)) {
+//             $titleID = mysqli_insert_id($link);
+//         } else {
+//             echo "Error: " . $insertQuery . "<br>" . mysqli_error($conn);
+//         }
+//     }else{
+//         $query = "UPDATE docs SET `name`='$title' WHERE id='$formStatus'";
+//         mysqli_query($link, $query) or die(mysqli_error($link));
+//     }
+// }
 
 ?>
 
@@ -114,6 +147,9 @@ if(!empty($_POST["title"]) && !empty($_POST["formStatus"])){
                         <h2>Online docs</h2>
                     </a>
                 </div>
+                <div class="col">
+                    <h4 class="text-center"><?php echo end($docTitle)["name"]?></h4>
+                </div>
                 <div class="col d-flex justify-content-end" style="height: 50px">
                     <div class="d-flex">
                         <a href="/?logout=1" class="btn btn-danger" style="height: 40px">Chiqish</a>
@@ -125,15 +161,13 @@ if(!empty($_POST["title"]) && !empty($_POST["formStatus"])){
     </div>
     <div class="doc-title">
         <div class="container">
-            <div class="row d-flex justify-content-between w-100 pt-3">
-                <div class="card bordered m-3" style="height: 50px; ">
-                    <h3 class="p-1 text-center" style="cursor: text" id="doc_title"></h3>
-                </div>
-            </div>
-            <div class="row d-flex justify-content-between">
-                <div class="card p-2 col-3 me-1">
-                    <h5>Qo'llanma mavzulari</h5>
-                    <div class="d-flex" style="flex-direction: column; justify-content: space-between;">
+            <div class="row d-flex justify-content-between mt-3">
+                <div class="card p-3 col-4 me-1">
+                    <div class="d-flex justify-content-between">
+                        <h4>Qo'llanma mavzulari</h4>
+                        <a title="Add new sub doc" href="/templates/create.php?docId=<?=$_GET['docId']?>" class="btn btn-primary" id="addThemeBtn"><i class="bi bi-plus-circle" style="font-size: 18px"></i></a>
+                    </div>
+                    <div class="d-flex mt-2"  style="overflow: auto; max-height: 75vh">
                         <table class="table">
                             <thead>
                                 <tr>
@@ -143,26 +177,40 @@ if(!empty($_POST["title"]) && !empty($_POST["formStatus"])){
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td class="d-flex">
-                                        <button type="button" class="btn btn-primary btn-sm me-1"><i class="bi bi-pencil-square" style="font-size: 15px"></i></button>
-                                        <button type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash3" style="font-size: 15px"></i></button>
-                                    </td>
-                                </tr>
+                                <?php
+                                $tr = "";
+                                foreach($docParts as $key => $value){
+                                    $tr .= '<tr>';
+                                    $tr .= '<th scope="row">'.($key+1).'</th>';
+                                    $tr .= '<td>'.$value["title"].'</td>';
+                                    $tr .= '<td class="d-flex">';
+                                    $tr .= '<a href="/templates/read.php?docId='.$value["doc_id"].'&page='.$value['id'].'" class="btn btn-primary btn-sm me-1"><i class="bi bi-eye" style="font-size: 15px"></i></a>
+                                    <button type="button" class="btn btn-primary btn-sm me-1"><i class="bi bi-pencil-square" style="font-size: 15px"></i></button>
+                                    <button type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash3" style="font-size: 15px"></i></button>';
+                                    $tr .= '</td>';
+                                    $tr .= '</tr>';
+                                }
+                                    echo $tr;
+                                ?>
                             </tbody>
                         </table>
-                        <button class="btn btn-primary" id="addThemeBtn">Add</button>
+                        
                     </div>
                 </div>
-                <div class="card col-8 p-2">
-                    <h3>Content</h3>
+                <form class="card col-7 p-2" style="height: max-content" action="/templates/create.php" method="post">
+                    <h3>Mavzu qo'shish</h3>
+                    <input type="hidden" name="formType" value="addDocPart"/>
+                    <input type="hidden" name="docId" value="<?= $_GET['docId']?>"/>
+                    <div class="mb-3">
+                        <label for="title">Mavzu nomi</label>
+                        <input type="text" class="form-control" name="title" placeholder="for operatori ..." id="title" />
+                    </div>
                     <div class="form-floating">
-                        <textarea class="form-control" placeholder="Write content here ..." id="floatingTextarea2" style="height: 300px"></textarea>
-                        <label for="floatingTextarea2">Content</label>
+                        <textarea class="form-control" placeholder="Write content here ..." name="body" id="floatingTextarea2" style="height: 300px"></textarea>
+                        <label for="floatingTextarea2">Mavzu matni</label>
                     </div>
-                </div>
+                    <button type="submit" class="btn btn-primary my-2">Qo'shish</button>
+                </form>
             </div>
         </div>
     </div>
@@ -182,11 +230,11 @@ if(!empty($_POST["title"]) && !empty($_POST["formStatus"])){
 
         document.addEventListener("DOMContentLoaded", function() {
             const oldCreatedTitle = <?php if($title){echo('"'.$title.'"');}else{echo 'false';} ?>;
-            if(!oldCreatedTitle) {
-                setTitle.style.display = "block";
-            }else{
-                doc_title.innerHTML = oldCreatedTitle;
-            }
+            // if(!oldCreatedTitle) {
+            //     setTitle.style.display = "block";
+            // }else{
+            //     doc_title.innerHTML = oldCreatedTitle;
+            // }
         })
 
         doc_title.addEventListener("click", function() {
