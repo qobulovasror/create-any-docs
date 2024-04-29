@@ -25,6 +25,7 @@ require ('../config/db.php');
 function getOwnDocs($link, $userID){
     $query = "SELECT
     docs.id,
+    docs.author_id,
     docs.name,
     docs.status,
     COUNT(doc_pages.id) AS counts
@@ -40,28 +41,30 @@ GROUP BY
 }
 
 
-if (!empty($_POST["title"]) && !empty($_POST["formStatus"])) {
+if (!empty($_POST["title"]) && $_POST["formType"]=="add") {
     $title = $_POST["title"];
     str_replace("'", "\'", $title);
-    $formStatus = $_POST["formStatus"];
-    if ($formStatus == "create") {
-        
+    $query = "SELECT * FROM docs WHERE name='$title'";
+    $resoult = mysqli_fetch_assoc(mysqli_query($link, $query));
+
+    if (empty($resoult)) {
         $query = "INSERT INTO docs SET author_id='$userID', name='$title'";
         if (mysqli_query($link, $query)) {
             $titleID = mysqli_insert_id($link);
+            redrect("/templates/create.php?editDocId=".$titleID);
         } else {
             echo "Error: " . $insertQuery . "<br>" . mysqli_error($conn);
         }
-    } else {
-        $query = "UPDATE docs SET `name`='$title' WHERE id='$formStatus'";
-        mysqli_query($link, $query) or die(mysqli_error($link));
+    }else{
+        echo '<div class="container"> <div class="m-3 alert alert-danger" role="alert">This document already exists!</div> </div>';
     }
 }
 
 //for edit doc 
-if(!empty($_POST["name"]) && !empty($_POST["status"]) && !empty($_POST["formType"])){
+if(!empty($_POST["name"]) && !empty($_POST["status"]) && $_POST["formType"]=="edit"){
     $title = $_POST["name"];
     $status = $_POST["status"];
+    $status = $_POST["editDocId"];
     $id = $_POST['formType'];
     str_replace("'", "\'", $title);
     $query = "UPDATE `docs` SET `name`='$title', `status`='$status' WHERE `id`='$id'";
@@ -184,7 +187,7 @@ $myDocs = getOwnDocs($link, $userID);
                                                 style="font-size: 15px"></i></a>
                                         <a type="button" href="/templates/create.php?editDocId='.$value["id"].'" title="edit items" class="btn btn-info btn-sm me-1"><i class="bi bi-list-ul"
                                                 style="font-size: 15px"></i></a>
-                                        <a type="button" title="delete doc" class="btn btn-danger btn-sm"><i class="bi bi-trash3"
+                                        <a type="button" href="/components/confirm.php?type=doc&owner='.$value["author_id"].'&delItemId='.$value["id"].'&message=Document o\'chirilsinmi" title="delete doc" class="btn btn-danger btn-sm"><i class="bi bi-trash3"
                                                 style="font-size: 15px"></i></a></td>' ; 
                                         $tr .= "</tr>" ; 
                                     }
@@ -205,7 +208,8 @@ $myDocs = getOwnDocs($link, $userID);
                 ?>
                     <form class="card col-4 px-2 py-3" action="/templates/docList.php" method="post" style="height: max-content">
                         <h3 class="text-center">Qo'llanmani tahrirlash</h3>
-                        <input type="hidden" name="formType" value='<?=$editDoc["id"]?>'>
+                        <input type="hidden" name="formType" value='edit'>
+                        <input type="hidden" name="editDocId" value='<?=$editDoc["id"]?>'>
                         <div class="mb-3">
                             <label for="tutorialName" class="form-label">Qo'llanma nomi</label>
                             <input type="text" class="form-control" name="name" id="tutorialName" placeholder="Javascript..."
@@ -225,11 +229,12 @@ $myDocs = getOwnDocs($link, $userID);
                 <?php 
                     else:
                 ?>
-                <form class="card col-4 px-2 py-3" action="/templates/create.php" method="post" style="height: max-content">
+                <form class="card col-4 px-2 py-3" action="/templates/docList.php" method="post" style="height: max-content">
                     <h3 class="text-center">Yangi qo'llanma yaratish</h3>
+                    <input type="hidden" name="formType" value='add'>
                     <div class="mb-3">
                         <label for="tutorialName" class="form-label">Qo'llanma nomini kiriting</label>
-                        <input type="text" class="form-control" name="name" id="tutorialName" placeholder="Javascript..."
+                        <input type="text" class="form-control" name="title" id="tutorialName" placeholder="Javascript..."
                             minlength="1" required />
                     </div>
                     <button class="btn btn-success">Yaratish</button>
