@@ -1,3 +1,10 @@
+<!-- 
+1. delete topic +
+2. edit topic  +
+3. if delete doc, all topics would delete +
+4. edit read docs 
+ -->
+
 <?php
 function redrect($url)
 {
@@ -41,18 +48,21 @@ if(empty($_GET["docId"])){
         $body = $_POST['body'];
         $doc_id = $_POST["docId"];
         
-        // str_replace("'", "\'", $title);
-        // str_replace("'", "\'", $body);
+        str_replace("'", "\'", $title);
+        str_replace("'", "\'", $body);
         if($_POST["formType"]=="addDocPart"){
             $query = "INSERT INTO `doc_pages` (`doc_id`, `title`, `body`) VALUES ('$doc_id', '$title', '$body')";
             mysqli_query($link, $query) or die(mysqli_error($link));
         }else{
-            // $query = "UPDATE `doc_pages` SET `title`='$title',`body`='$body' WHERE id=docPartID";
-            // mysqli_query($link, $query) or die(mysqli_error($link));
+            $editDocPartId = $_POST["editDocPartId"];
+            if($_POST["formType"]=="editDocPart"){
+                $query = "UPDATE `doc_pages` SET `title`='$title',`body`='$body' WHERE id=$editDocPartId";
+                mysqli_query($link, $query) or die(mysqli_error($link));
+            }
         }
         $curDocID = $_POST['docId'];
     }else{
-        // redrect("../index.php");   
+        redrect("../index.php");   
     }
 }else{
     $curDocID = $_GET['docId'];
@@ -60,27 +70,6 @@ if(empty($_GET["docId"])){
 
 $docParts = getDocItems($link, $curDocID);
 $docTitle = getDocTitle($link, $curDocID);
-
-// $title = "";
-// $titleID = "";
-// $setTitleErr = "";
-// if(!empty($_POST["title"]) && !empty($_POST["formStatus"])){
-//     $title = $_POST["title"];
-//     str_replace("'", "\'", $title);
-//     $formStatus = $_POST["formStatus"];
-//     if($formStatus=="create"){
-//         $userID = $_SESSION["id"];
-//         $query = "INSERT INTO docs SET author_id='$userID', name='$title'";
-//         if (mysqli_query($link, $query)) {
-//             $titleID = mysqli_insert_id($link);
-//         } else {
-//             echo "Error: " . $insertQuery . "<br>" . mysqli_error($conn);
-//         }
-//     }else{
-//         $query = "UPDATE docs SET `name`='$title' WHERE id='$formStatus'";
-//         mysqli_query($link, $query) or die(mysqli_error($link));
-//     }
-// }
 
 ?>
 
@@ -101,44 +90,6 @@ $docTitle = getDocTitle($link, $curDocID);
 </head>
 
 <body>
-    <div class="modal" tabindex="-1" id="setTitle">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="/templates/create.php" method="post">
-                    <input type="hidden" value="<?php echo ($title)? $titleID: 'create';?>" name="formStatus">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Qo'llanma sarlovhasini kiriting</h5>
-                    </div>
-                    <div class="modal-body">
-                    <div class="mb-3">
-                        <input type="text" class="form-control" name="title" placeholder="Php..." id="setTitleInputID" minlength="1" required>
-                    </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary" id="setTitleBtn">Kiritish</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal" tabindex="-1" id="addThemeWindow">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Qo'llanmaga mavzu qo'shish</h5>
-                </div>
-                <div class="modal-body">
-                <div class="mb-3">
-                    <input type="text" class="form-control" name="title" placeholder="For operatori..." id="addThemeInputID" required>
-                </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="closeAddThemeWinBtn">Qo'shish</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="navbar bg-body-tertiary w-100">
         <div class="container">
             <div class="row d-flex justify-content-between w-100 pt-3">
@@ -152,6 +103,7 @@ $docTitle = getDocTitle($link, $curDocID);
                 </div>
                 <div class="col d-flex justify-content-end" style="height: 50px">
                     <div class="d-flex">
+                        <a href="/templates/docList.php" class="btn btn-primary me-2"  style="height: 40px">Mening qo'llanmalarim</a>
                         <a href="/?logout=1" class="btn btn-danger" style="height: 40px">Chiqish</a>
                     </div>
                 </div>
@@ -185,8 +137,8 @@ $docTitle = getDocTitle($link, $curDocID);
                                     $tr .= '<td>'.$value["title"].'</td>';
                                     $tr .= '<td class="d-flex">';
                                     $tr .= '<a href="/templates/read.php?docId='.$value["doc_id"].'&page='.$value['id'].'" class="btn btn-primary btn-sm me-1"><i class="bi bi-eye" style="font-size: 15px"></i></a>
-                                    <button type="button" class="btn btn-primary btn-sm me-1"><i class="bi bi-pencil-square" style="font-size: 15px"></i></button>
-                                    <button type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash3" style="font-size: 15px"></i></button>';
+                                    <a href="/templates/create.php?docId='.$curDocID.'&editDocPartId='.$value["id"].'" class="btn btn-primary btn-sm me-1"><i class="bi bi-pencil-square" style="font-size: 15px"></i></button>
+                                    <a href="/components/confirm.php?type=docPart&owner='.$_SESSION["id"].'&delItemId='.$value["id"].'&message=Document mavzusi o\'chirilsinmi" type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash3" style="font-size: 15px"></i></button>';
                                     $tr .= '</td>';
                                     $tr .= '</tr>';
                                 }
@@ -197,6 +149,32 @@ $docTitle = getDocTitle($link, $curDocID);
                         
                     </div>
                 </div>
+                <?php 
+                    if(!empty($_GET["editDocPartId"])):
+
+                        $editDocPart = array_filter($docParts, function($ar) {
+                            return ($ar['id'] == $_GET["editDocPartId"]);
+                        });
+                        $editDocPart = end($editDocPart);
+                ?>
+                <form class="card col-7 p-2" style="height: max-content" action="/templates/create.php" method="post">
+                    <h3>Mavzuni tahrirlash</h3>
+                    <input type="hidden" name="formType" value="editDocPart"/>
+                    <input type="hidden" name="docId" value="<?= $_GET['docId']?>"/>
+                    <input type="hidden" name="editDocPartId" value="<?= $_GET['editDocPartId']?>"/>
+                    <div class="mb-3">
+                        <label for="title">Mavzu nomi</label>
+                        <input type="text" class="form-control" name="title" placeholder="for operatori ..." id="title" value="<?=$editDocPart["title"]?>"/>
+                    </div>
+                    <div class="form-floating">
+                        <textarea class="form-control" placeholder="Write content here ..." name="body" id="floatingTextarea1" style="height: 300px"><?=$editDocPart["body"]?></textarea>
+                        <label for="floatingTextarea1">Mavzu matni</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary my-2">Tahrirlash</button>
+                </form>
+                <?php 
+                    else:
+                ?>
                 <form class="card col-7 p-2" style="height: max-content" action="/templates/create.php" method="post">
                     <h3>Mavzu qo'shish</h3>
                     <input type="hidden" name="formType" value="addDocPart"/>
@@ -211,85 +189,12 @@ $docTitle = getDocTitle($link, $curDocID);
                     </div>
                     <button type="submit" class="btn btn-primary my-2">Qo'shish</button>
                 </form>
+                <?php
+                    endif;
+                ?>
             </div>
         </div>
     </div>
-
-
-    <script>
-        const setTitle = document.getElementById('setTitle')
-        const setTitleBtn = document.getElementById('setTitleBtn')
-        const doc_title = document.getElementById('doc_title')
-        const setTitleInputID = document.getElementById('setTitleInputID')
-
-        const addThemeWindow = document.getElementById('addThemeWindow')
-        const addThemeBtn = document.getElementById('addThemeBtn')
-        const addThemeInputID = document.getElementById('addThemeInputID')
-        const closeAddThemeWinBtn = document.getElementById('closeAddThemeWinBtn')
-
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const oldCreatedTitle = <?php if($title){echo('"'.$title.'"');}else{echo 'false';} ?>;
-            // if(!oldCreatedTitle) {
-            //     setTitle.style.display = "block";
-            // }else{
-            //     doc_title.innerHTML = oldCreatedTitle;
-            // }
-        })
-
-        doc_title.addEventListener("click", function() {
-            setTitle.style.display = "block";
-            if(doc_title.innerHTML){
-                setTitleInputID.value = doc_title.innerText;
-            }
-        })
-
-        setTitleBtn.addEventListener('click', ()=>{
-            if(setTitleInputID.value.length > 0 ){
-                setTitle.style.display = "none";
-                doc_title.innerHTML = setTitleInputID.value;
-
-                // const dataToSend = {
-                //     key1: 'value1',
-                //     key2: 'value2'
-                // };
-
-                // // Make a POST request using fetch
-                // fetch('/templates/createBack.php', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json'
-                //     },
-                //     body: JSON.stringify(dataToSend)
-                // })
-                // .then(response => {
-                //     console.log(response);
-                //     if (!response.ok) {
-                //         throw new Error('Network response was not ok');
-                //     }
-                //     return response.json(); // Parse the JSON from the response
-                // })
-                // .then(data => {
-                //     console.log('Response from server:', data);
-                // })
-                // .catch(error => {
-                //     console.error('Error:', error);
-                // });
-
-            }
-        })
-
-        addThemeBtn.addEventListener('click', function(){
-            addThemeWindow.style.display = 'block'
-        })
-        closeAddThemeWinBtn.addEventListener('click', function(){
-            addThemeWindow.style.display = 'none'
-        })
-
-        
-
-    </script>
-
 </body>
 
 </html>

@@ -19,6 +19,14 @@ if(!empty($_POST['type']) && !empty($_POST['delItemId']) && !empty($_POST["chang
         $id = $_POST['delItemId'];
         $query = "DELETE FROM `docs` WHERE `id`=$id";
         mysqli_query($link, $query) or die(mysqli_error($link));
+        $query = "DELETE FROM `doc_pages` WHERE `doc_id`=$id";
+        mysqli_query($link, $query) or die(mysqli_error($link));
+        redrect("../templates/docList.php");
+    }
+    if($_POST['changeType']=="delete" && $_POST["type"]=="docPart"){
+        $id = $_POST['delItemId'];
+        $query = "DELETE FROM `doc_pages` WHERE `id`=$id";
+        mysqli_query($link, $query) or die(mysqli_error($link));
         redrect("../templates/docList.php");
     }
 }
