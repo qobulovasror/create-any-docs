@@ -34,7 +34,7 @@ if (!empty($_POST["email"]) and !empty($_POST['password'])) {
     } else {
       $error_message = "email yoki parol xato";
     }
-  }else{
+  } else {
     $error_message = "email yoki parol xato";
   }
 }
@@ -42,6 +42,7 @@ if (!empty($_POST["email"]) and !empty($_POST['password'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -66,7 +67,7 @@ if (!empty($_POST["email"]) and !empty($_POST['password'])) {
             ?>
             <div class="mb-3">
               <label for="exampleInputEmail1" class="form-label">Email</label>
-              <input type="email" name="email" class="form-control bg-light"  placeholder="Emailingizni kiriting"
+              <input type="email" name="email" class="form-control bg-light" placeholder="Emailingizni kiriting"
                 id="exampleInputEmail1" required />
             </div>
             <div class="mb-3">
@@ -77,6 +78,9 @@ if (!empty($_POST["email"]) and !empty($_POST['password'])) {
             <button type="submit" class="btn btn-primary" style="width: 100%;">Kirish</button>
             <div class="text-center mt-3">
               <a href="regis.php" class="m-3 text-center">Ro'yxatdan o'tish</a>
+            </div>
+            <div class="text-center mt-3">
+              <a href="/" class="m-3 text-center">Bosh sahifaga qaytish</a>
             </div>
           </form>
         </div>

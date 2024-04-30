@@ -4,7 +4,7 @@ function redrect($url)
   header("Location:$url");
 }
 
-if(!empty($_SESSION['auth'])){
+if (!empty($_SESSION['auth'])) {
   redrect("../index.php");
 }
 
@@ -31,7 +31,7 @@ if (!empty($_POST)) {
       $error_message = "Ismni to'g'ri kiriting.";
     }
     // check email
-    if (!$error_message &&!preg_match($pattern_email, $email)) {
+    if (!$error_message && !preg_match($pattern_email, $email)) {
       $error_message = "Email qiymati mos emas.";
     }
     // check password
@@ -46,7 +46,7 @@ if (!empty($_POST)) {
       session_start();
       $_SESSION['auth'] = true;
       $_SESSION['id'] = mysqli_insert_id($link);
-      $_SESSION['email']=$email;
+      $_SESSION['email'] = $email;
       redrect("../index.php");
     }
   } else {
@@ -98,6 +98,9 @@ if (!empty($_POST)) {
             <button type="submit" class="btn btn-primary" style="width: 100%;">Ro'yhatdan o'tish</button>
             <div class="text-center mt-3">
               <a href="login.php" class="m-3 text-center">Tizimga kirish</a>
+            </div>
+            <div class="text-center mt-3">
+              <a href="/" class="m-3 text-center">Bosh sahifaga qaytish</a>
             </div>
           </form>
         </div>
