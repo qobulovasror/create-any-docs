@@ -44,7 +44,7 @@ GROUP BY
 
 if (!empty($_POST["title"]) && $_POST["formType"]=="add") {
     $title = $_POST["title"];
-    str_replace("'", "\'", $title);
+    $title = str_replace("'", "\'", $title);
     $query = "SELECT * FROM docs WHERE name='$title'";
     $resoult = mysqli_fetch_assoc(mysqli_query($link, $query));
 
@@ -66,7 +66,7 @@ if(!empty($_POST["name"]) && !empty($_POST["status"]) && $_POST["formType"]=="ed
     $title = $_POST["name"];
     $status = $_POST["status"];
     $id = $_POST['editDocId'];
-    str_replace("'", "\'", $title);
+    $title = str_replace("'", "\'", $title);
     $query = "UPDATE `docs` SET `name`='$title', `status`='$status' WHERE `id`='$id'";
     mysqli_query($link, $query) or die(mysqli_error($link));
 }

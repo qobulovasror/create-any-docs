@@ -41,8 +41,8 @@ if(empty($_GET["docId"])){
         $body = $_POST['body'];
         $doc_id = $_POST["docId"];
         
-        str_replace("'", "\'", $title);
-        str_replace("'", "\'", $body);
+        $title = str_replace("'", "\'", $title);
+        $body = str_replace("'", "\'", $body);
         if($_POST["formType"]=="addDocPart"){
             $query = "INSERT INTO `doc_pages` (`doc_id`, `title`, `body`) VALUES ('$doc_id', '$title', '$body')";
             mysqli_query($link, $query) or die(mysqli_error($link));
