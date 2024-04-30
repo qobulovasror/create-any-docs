@@ -4,7 +4,7 @@ require ("config/db.php");
 <div class="container px-4 text-center">
   <div class="row">
     <?php
-    $query = "SELECT * FROM `docs` ORDER BY id DESC;";
+    $query = "SELECT * FROM `docs` WHERE `status`=1 ORDER BY id DESC;";
     $result = mysqli_query($link, $query) or die(mysqli_error($link));
     for ($data = []; $row = mysqli_fetch_assoc($result); $data[] = $row)
       ;

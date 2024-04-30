@@ -31,8 +31,9 @@ function getDocTitle($link, $doc_id){
 }
 
 $doc_id = "";
-$page = 1;
+$page = 0;
 $page_content = "";
+$page_content_title = "";
 
 if (!empty($_GET['docId'])) {
     $doc_id = $_GET['docId'];
@@ -101,13 +102,25 @@ $curDocTitle = end($curDocTitle)["name"];
             <div class="list-group  list-group-flush">
                 <?php
                 $list = "";
-                foreach ($curDoc as $value) {
+                foreach ($curDoc as $key => $value) {
                     $list .= '<a href="/templates/read.php?docId=' . $doc_id . '&page=' . $value['id'];
-                    if ($page == $value['id']) {
-                        $list .= '" class="list-group-item list-group-item-action active" aria-current="true">';
-                        $page_content = $value['body'];
-                    } else {
-                        $list .= '" class="list-group-item list-group-item-action" aria-current="true">';
+                    if($page == 0){
+                        if($key==0){
+                            $page_content = $value['body'];
+                            $page_content_title = $value['title'];
+                            $list .= '" class="list-group-item list-group-item-action active" aria-current="true">';
+                        }else{
+                            $list .= '" class="list-group-item list-group-item-action" aria-current="true">';
+                        }
+                    }else{
+                        if ($page == $value['id']) {
+                            $list .= '" class="list-group-item list-group-item-action active" aria-current="true">';
+                            $page_content = $value['body'];
+                            $page_content_title = $value['title'];
+                        } else {
+                            $list .= '" class="list-group-item list-group-item-action" aria-current="true">';
+                        }
+
                     }
                     $list .= $value['title'];
                     $list .= '</a>';
@@ -120,6 +133,7 @@ $curDocTitle = end($curDocTitle)["name"];
         <div class="right-side">
             <div class="container-2  py-3">
                 <?php
+                    echo "<h2 class='text-center'>".$page_content_title."</h2>";
                 ?>
                 <p id="doc_body"></p>
             </div>
@@ -127,6 +141,7 @@ $curDocTitle = end($curDocTitle)["name"];
     </div>
 
     <script>
+        const title = `<?php echo $page_content_title; ?>`
         const data = `<?php echo $page_content; ?>`
         const converter = new showdown.Converter();
         const doc_body = document.getElementById("doc_body");
