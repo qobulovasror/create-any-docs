@@ -31,7 +31,8 @@ function getOwnDocs($link, $userID){
     COUNT(doc_pages.id) AS counts
 FROM
     docs
-LEFT JOIN doc_pages ON docs.id = doc_pages.doc_id and docs.author_id=$userID
+LEFT JOIN doc_pages ON docs.id = doc_pages.doc_id
+WHERE docs.author_id = $userID
 GROUP BY
     docs.id;";
     $result = mysqli_query($link, $query) or die(mysqli_error($link));
@@ -72,7 +73,6 @@ if(!empty($_POST["name"]) && !empty($_POST["status"]) && $_POST["formType"]=="ed
 
 
 $myDocs = getOwnDocs($link, $userID);
-
 ?>
 
 <!DOCTYPE html>

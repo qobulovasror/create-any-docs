@@ -1,10 +1,3 @@
-<!-- 
-1. delete topic +
-2. edit topic  +
-3. if delete doc, all topics would delete +
-4. edit read docs 
- -->
-
 <?php
 function redrect($url)
 {
